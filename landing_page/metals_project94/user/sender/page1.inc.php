@@ -1,0 +1,464 @@
+<?php
+
+
+
+if (isset($_POST['submit1'])){
+
+session_start();
+
+include '../../includes/dbh.inc.php';
+
+$ASSESSMENT_NUMBER_SEARCH = 0;
+
+$sql_search_assessment = "Select * from XX_QUOTE_HEADERS_ALL where ASSESSMENT_NUMBER = '".$_SESSION["ASSESSMENT_NUMBER"]."'";
+
+
+$result_search_assessment= oci_parse($conn, $sql_search_assessment);
+oci_execute($result_search_assessment);
+while($row_ASSESSMENT_NUMBER =oci_fetch_array($result_search_assessment,OCI_ASSOC)):
+  $ASSESSMENT_NUMBER_SEARCH = $row_ASSESSMENT_NUMBER["ASSESSMENT_NUMBER"];
+endwhile;
+
+if($ASSESSMENT_NUMBER_SEARCH != 0 ){
+  $delete_ASSESSMENT_NUMBER = "DELETE FROM XX_QUOTE_HEADERS_ALL WHERE ASSESSMENT_NUMBER = '".$_SESSION["ASSESSMENT_NUMBER"]."'";
+  $result_delete_assessment= oci_parse($conn, $delete_ASSESSMENT_NUMBER);
+  oci_execute($result_delete_assessment);
+}
+
+// echo $_SESSION["ASSESSMENT_NUMBER"]."</br>";
+
+// echo $_SESSION["CUSTOMER_ID"]."</br>";
+// echo $_SESSION["QUOTE_NAME"]."</br>";
+// echo $_SESSION["QUOTE_NUMBER"];
+// echo $_SESSION["CURRENCY"]."</br>";
+
+
+// echo $_SESSION["DP_AMOUNT"]."</br>";
+// echo $_SESSION["PAYMENT_TYPE"]."</br>";
+// echo $_SESSION["AGENT_DEALER_COMM_PAYABLE"]."</br>";
+// echo $_SESSION["CHEQUE_REF_NO"]."</br>";
+// echo $_SESSION["NAME_OF_AGENT_DEALER"]."</br>";
+// echo $_SESSION['QUOTE_DATE'];
+// echo $_SESSION["REMITTANCE_BANK_NAME"]."</br>";
+// echo $_SESSION["NAME_OF_PROMO_SCHEME"]."</br>";
+// echo $_SESSION["NO_OF_INSTALLMENT"]."</br>";
+// echo $_SESSION["REMITTANCE_BRANCE_NAME"]."</br>";
+// echo $_SESSION["PROMO_GIFT_APPLICABLE"]."</br>";
+// echo $_SESSION["DISCOUNT_VALUE"]."</br>";
+// echo $_SESSION["DISCOUNT_TYPE"]."</br>";
+
+// echo $_SESSION["BANK_ACCOUNT_NO"]."</br>";
+// echo $_SESSION["NAME_OF_GIFT"]."</br>";
+// echo $_SESSION["NO_OF_FREE_INSTALLMENT"]."</br>";
+// echo $_SESSION["MICR_CHEQUE_GIVEN_IN_DEL"]."</br>";
+// echo $_SESSION["INSTALLMENT_START_DAY"]."</br>";
+// echo $_SESSION["CUSTOMER_BANK_NAME"]."</br>";
+// echo $_SESSION["OCCUPATION"]."</br>";
+
+// echo $_SESSION["MONTHLY_INCOME"]."</br>";
+
+// echo $_SESSION["TOTAL_DEPENDENT"]."</br>";
+// echo $_SESSION["SOURCE_OF_MONEY"]."</br>";
+// echo $_SESSION["OWN_EQUITY_AMOUNT"]."</br>";
+// echo $_SESSION["ORGANIZATION_ID"]."</br>";
+// echo $_SESSION["BORROWED_EQUITY_AMOUNT"]."</br>";
+// echo $_SESSION["REMARKS"]."</br>";
+// echo $_SESSION["u_id"];
+
+$_SESSION['NOTIFI_STATUS'] = 0;
+// $_SESSION['QS_APPROVERS1'] = "PENDING";
+
+
+//replace will be done
+
+
+
+
+  $QUOTE_HEADER_ID = $_SESSION["P_QUOTE_HEADER_ID"];
+  $ASSESSMENT_NUMBER = $_SESSION["ASSESSMENT_NUMBER"];
+  $CUSTOMER_ID = $_SESSION["CUSTOMER_ID"];
+  $QUOTE_NUMBER = $_SESSION["QUOTE_NUMBER"];
+  $QUOTE_NAME = $_SESSION["QUOTE_NAME"];
+  $QUOTE_DATE = $_SESSION['QUOTE_DATE'];
+  // $QS_APPROVERS1 = $_SESSION['QS_APPROVERS1'];
+  $QUOTE_TYPE_NAME = $_SESSION['QUOTE_TYPE'];
+  $QUOTE_STATUS = $_SESSION['QUOTE_STATUS'];
+  $NOTIFI_STATUS = $_SESSION['NOTIFI_STATUS'];
+  $CURRENCY = $_SESSION['CURRENCY'];
+  $NO_OF_INSTALLMENT = $_SESSION['NO_OF_INSTALLMENT'];
+  $DP_AMOUNT = $_SESSION['DP_AMOUNT'];
+  $DP_PERCENT = $_SESSION['DP_PERCENT'];
+  $ACTUAL_DP_AMOUNT = $_SESSION['ACTUAL_DP_AMOUNT'];
+  $NO_OF_FREE_INSTALLMENT = $_SESSION['NO_OF_FREE_INSTALLMENT'];
+  $DISCOUNT_VALUE = $_SESSION['DISCOUNT_VALUE'];
+  $DISCOUNT_TYPE = $_SESSION['DISCOUNT_TYPE'];
+  $INSTALLMENT_START_DAY = $_SESSION['INSTALLMENT_START_DAY'];
+  $PAYMENT_TYPE = $_SESSION['PAYMENT_TYPE'];
+  $CHEQUE_REF_NO = $_SESSION['CHEQUE_REF_NO'];
+  $REMITTANCE_BANK_ID = $_SESSION['REMITTANCE_BANK_NAME'];
+  $REMITTANCE_BRANCH_ID = $_SESSION['REMITTANCE_BRANCE_NAME'];
+  $BANK_ACCOUNT_NO = $_SESSION['BANK_ACCOUNT_NO'];
+  $MICR_CHEQUE_GIVEN_IN_DEL = $_SESSION['MICR_CHEQUE_GIVEN_IN_DEL'];
+  $CUSTOMER_BANK_NAME = $_SESSION['CUSTOMER_BANK_NAME'];
+  $AGENT_DEALER_COMM_PAYABLE = $_SESSION['AGENT_DEALER_COMM_PAYABLE'];
+  $NAME_OF_AGENT_DEALER= $_SESSION['NAME_OF_AGENT_DEALER'];
+  $NAME_OF_PROMO_SCHEME = $_SESSION['NAME_OF_PROMO_SCHEME'];
+  $PROMO_GIFT_APPLICABLE = $_SESSION['PROMO_GIFT_APPLICABLE'];
+  $NAME_OF_GIFT = $_SESSION['NAME_OF_GIFT'];
+  $ORGANIZATION_ID = $_SESSION["ORGANIZATION_ID"];
+  $REGISTRATION_AMOUNT = $_SESSION["REGISTRATION_AMOUNT"];
+  $REGISTRATION_INC = $_SESSION["REGISTRATION_INC"];
+  $ORG_ID = $_SESSION["ORG_ID"];
+  $REMARKS = $_SESSION['REMARKS'];
+  $USER_STATUS1 = 0;
+
+  $sql90 = "SELECT list_header_id price_list_id,NAME price_list_name FROM qp_list_headers_v
+  WHERE AUTOMATIC_FLAG='Y'
+  AND CURRENCY_CODE='BDT'
+  AND ACTIVE_FLAG='Y'
+  AND NAME = '".$_SESSION['PRICE_LIST_NAME']."'
+  AND TRUNC(SYSDATE) BETWEEN START_DATE_ACTIVE AND NVL(END_DATE_ACTIVE,TRUNC(SYSDATE))
+  AND ORIG_ORG_ID = '".$_SESSION['ORG_ID']."' ";
+
+  $result90= oci_parse($conn, $sql90);
+  oci_execute($result90);
+  while($row90 =oci_fetch_array($result90,OCI_ASSOC)):
+    $PRICE_LIST_ID = $row90["PRICE_LIST_ID"];
+  endwhile;
+
+  $sql91 = "SELECT TTT.TRANSACTION_TYPE_ID, NAME, DESCRIPTION
+  FROM oe_transaction_types_tl ttt, oe_transaction_types_all tta
+ WHERE     ttt.TRANSACTION_TYPE_ID = tta.TRANSACTION_TYPE_ID
+       AND TRANSACTION_TYPE_CODE = 'ORDER'
+       AND NAME = '".$QUOTE_TYPE_NAME."'
+       AND NVL (END_DATE_ACTIVE, TRUNC (SYSDATE)) >= TRUNC (SYSDATE)
+       AND tta.org_id = '".$_SESSION['ORG_ID']."'
+       AND WAREHOUSE_ID = '".$_SESSION["ORGANIZATION_ID"]."' ";
+
+  $result91 = oci_parse($conn, $sql91);
+  oci_execute($result91);
+  while($row91 =oci_fetch_array($result91,OCI_ASSOC)):
+    $QUOTE_TYPE_ID = $row91["TRANSACTION_TYPE_ID"];
+  endwhile;
+
+
+
+
+   $CREATED_BY = $_SESSION['u_id'];
+  // $USER_PWD = $_SESSION['p_id'];
+
+  $sql ="INSERT INTO XX_QUOTE_HEADERS_ALL (QUOTE_HEADER_ID,ORG_ID,ASSESSMENT_NUMBER,ORGANIZATION_ID,CUSTOMER_ID,QUOTE_NUMBER,QUOTE_NAME,QUOTE_DATE,QUOTE_TYPE_ID,QUOTE_STATUS,NOTIFI_STATUS,CURRENCY,NO_OF_INSTALLMENT,DP_AMOUNT,DP_PERCENT,ACTUAL_DP_AMOUNT,NO_OF_FREE_INSTALLMENT,DISCOUNT_VALUE,DISCOUNT_TYPE,INSTALLMENT_START_DAY,PAYMENT_TYPE,CHEQUE_REF_NO,REMITTANCE_BANK_ID,REMITTANCE_BRANCH_ID,BANK_ACCOUNT_NO,MICR_CHEQUE_GIVEN_IN_DEL,CUSTOMER_BANK_NAME,AGENT_DEALER_COMM_PAYABLE,NAME_OF_AGENT_DEALER,NAME_OF_PROMO_SCHEME, PROMO_GIFT_APPLICABLE, NAME_OF_GIFT, REMARKS, USER_STATUS1, CREATED_BY, PRICE_LIST_ID,REGISTRATION_AMOUNT,REGISTRATION_INC, CREATION_DATE)
+  values (:QUOTE_HEADER_ID,:ORG_ID,:ASSESSMENT_NUMBER,:ORGANIZATION_ID,:CUSTOMER_ID, :QUOTE_NUMBER,:QUOTE_NAME,TO_DATE('".$QUOTE_DATE."','yyyy-mm-dd'), :QUOTE_TYPE_ID, :QUOTE_STATUS, :NOTIFI_STATUS, :CURRENCY, :NO_OF_INSTALLMENT,:DP_AMOUNT, :DP_PERCENT, :ACTUAL_DP_AMOUNT, :NO_OF_FREE_INSTALLMENT, :DISCOUNT_VALUE, :DISCOUNT_TYPE, :INSTALLMENT_START_DAY, :PAYMENT_TYPE, :CHEQUE_REF_NO, :REMITTANCE_BANK_ID, :REMITTANCE_BRANCH_ID, :BANK_ACCOUNT_NO, :MICR_CHEQUE_GIVEN_IN_DEL, :CUSTOMER_BANK_NAME, :AGENT_DEALER_COMM_PAYABLE, :NAME_OF_AGENT_DEALER, :NAME_OF_PROMO_SCHEME, :PROMO_GIFT_APPLICABLE, :NAME_OF_GIFT, :REMARKS, :USER_STATUS1, :CREATED_BY, :PRICE_LIST_ID,:REGISTRATION_AMOUNT,:REGISTRATION_INC, sysdate )";
+
+  $result= oci_parse($conn, $sql);
+  oci_bind_by_name($result, ":QUOTE_HEADER_ID", $QUOTE_HEADER_ID);
+  oci_bind_by_name($result, ":ORG_ID", $ORG_ID);
+  oci_bind_by_name($result, ":ASSESSMENT_NUMBER", $ASSESSMENT_NUMBER);
+  oci_bind_by_name($result, ":ORGANIZATION_ID", $ORGANIZATION_ID);
+  oci_bind_by_name($result, ":CUSTOMER_ID", $CUSTOMER_ID);
+  oci_bind_by_name($result, ":QUOTE_NUMBER", $QUOTE_NUMBER);
+  oci_bind_by_name($result, ":QUOTE_NAME", $QUOTE_NAME);
+  oci_bind_by_name($result, ":QUOTE_TYPE_ID", $QUOTE_TYPE_ID);
+  oci_bind_by_name($result, ":QUOTE_STATUS", $QUOTE_STATUS);
+  oci_bind_by_name($result, ":NOTIFI_STATUS", $NOTIFI_STATUS);
+  oci_bind_by_name($result, ":CURRENCY", $CURRENCY);
+  oci_bind_by_name($result, ":NO_OF_INSTALLMENT", $NO_OF_INSTALLMENT);
+  oci_bind_by_name($result, ":DP_AMOUNT", $DP_AMOUNT);
+  oci_bind_by_name($result, ":DP_PERCENT", $DP_PERCENT);
+  oci_bind_by_name($result, ":ACTUAL_DP_AMOUNT", $ACTUAL_DP_AMOUNT);
+  oci_bind_by_name($result, ":NO_OF_FREE_INSTALLMENT", $NO_OF_FREE_INSTALLMENT);
+  oci_bind_by_name($result, ":DISCOUNT_VALUE", $DISCOUNT_VALUE);
+  oci_bind_by_name($result, ":DISCOUNT_TYPE", $DISCOUNT_TYPE);
+  oci_bind_by_name($result, ":INSTALLMENT_START_DAY", $INSTALLMENT_START_DAY);
+  oci_bind_by_name($result, ":PAYMENT_TYPE", $PAYMENT_TYPE);
+  oci_bind_by_name($result, ":CHEQUE_REF_NO", $CHEQUE_REF_NO);
+  oci_bind_by_name($result, ":REMITTANCE_BANK_ID", $REMITTANCE_BANK_ID);
+  oci_bind_by_name($result, ":REMITTANCE_BRANCH_ID", $REMITTANCE_BRANCH_ID);
+  oci_bind_by_name($result, ":BANK_ACCOUNT_NO", $BANK_ACCOUNT_NO);
+  oci_bind_by_name($result, ":MICR_CHEQUE_GIVEN_IN_DEL", $MICR_CHEQUE_GIVEN_IN_DEL);
+  oci_bind_by_name($result, ":CUSTOMER_BANK_NAME", $CUSTOMER_BANK_NAME);
+  oci_bind_by_name($result, ":AGENT_DEALER_COMM_PAYABLE", $AGENT_DEALER_COMM_PAYABLE);
+  oci_bind_by_name($result, ":NAME_OF_AGENT_DEALER", $NAME_OF_AGENT_DEALER);
+  oci_bind_by_name($result, ":NAME_OF_PROMO_SCHEME", $NAME_OF_PROMO_SCHEME);
+  oci_bind_by_name($result, ":PROMO_GIFT_APPLICABLE", $PROMO_GIFT_APPLICABLE);
+  oci_bind_by_name($result, ":NAME_OF_GIFT", $NAME_OF_GIFT);
+  oci_bind_by_name($result, ":REMARKS", $REMARKS);
+  // oci_bind_by_name($result, ":QS_APPROVERS1", $QS_APPROVERS1);
+
+
+  // oci_bind_by_name($result, ":APPROVERS1", $APPROVERS1);
+  // oci_bind_by_name($result, ":APPROVERS2", $APPROVERS2);
+  // oci_bind_by_name($result, ":APPROVERS3", $APPROVERS3);
+
+  oci_bind_by_name($result, ":USER_STATUS1", $USER_STATUS1);
+  // oci_bind_by_name($result, ":USER_STATUS2", $USER_STATUS2);
+  // oci_bind_by_name($result, ":USER_STATUS3", $USER_STATUS3);
+  oci_bind_by_name($result, ":CREATED_BY", $CREATED_BY);
+  oci_bind_by_name($result, ":PRICE_LIST_ID", $PRICE_LIST_ID);
+  oci_bind_by_name($result, ":REGISTRATION_AMOUNT", $REGISTRATION_AMOUNT);
+  oci_bind_by_name($result, ":REGISTRATION_INC", $REGISTRATION_INC);
+  oci_execute($result);
+
+
+  $query1 = "Select QUOTE_HEADER_ID from XX_QUOTE_HEADERS_ALL where ASSESSMENT_NUMBER = '".$ASSESSMENT_NUMBER."' ";
+
+  $result1= oci_parse($conn, $query1);
+  oci_execute($result1);
+
+  $test = oci_fetch_array($result1,OCI_ASSOC);
+  $_SESSION["QUOTE_HEADER_ID"] =  $test["QUOTE_HEADER_ID"];
+
+
+  $query2 = "Update XX_QUOTE_LINES_ALL
+  SET QUOTE_HEADER_ID = '".$_SESSION["QUOTE_HEADER_ID"]."' , ORGANIZATION_ID = '".$_SESSION["ORGANIZATION_ID"]."'
+  WHERE ASSESSMENT_NUMBER = '".$_SESSION['ASSESSMENT_NUMBER']."'";
+
+  $result2 = oci_parse($conn, $query2);
+
+  oci_execute($result2);
+
+
+  $query3= "INSERT INTO XX_QUOTE_APPROVAL_LIST_ALL
+  (APPROVAL_LIST_ID,QUOTE_HEADER_ID,SRC_APPRV_CONDITION_ID,SRC_APPRV_LIST_ID,SEQUENCE_NO,LIST_MEMBER_CODE,
+  LIST_MEMBER,
+  ACTIVITY_TYPE_CODE,
+  ACTIVITY_TYPE,
+  EMPLOYEE_ID,
+  FORWARED_FLAG,
+  PERFORM_ACTIVITY_TYPE_CODE,
+  CURRENT_RECORD_FLAG,
+  CREATED_BY,
+  CREATION_DATE,
+  LAST_UPDATED_BY,
+  LAST_UPDATE_DATE)
+  SELECT NULL,
+          QUOTE_HEADER_ID,
+          SRC_APPRV_CONDITION_ID,
+          SRC_APPRV_LIST_ID,
+          SEQUENCE_NO,
+          LIST_MEMBER_CODE,
+          LIST_MEMBER,
+          ACTIVITY_TYPE_CODE,
+          ACTIVITY_TYPE,
+          EMPLOYEE_ID,
+          'N',
+          'N',
+          'N',
+          CREATED_BY,
+          CREATION_DATE,
+          LAST_UPDATED_BY,
+          LAST_UPDATE_DATE
+     FROM XX_QUOTE_DRAFT_APPR_LIST_ALL
+     where QUOTE_HEADER_ID = '".$_SESSION['QUOTE_HEADER_ID']."'
+  ";
+
+$result3 = oci_parse($conn, $query3);
+
+oci_execute($result3);
+
+  $query4= "Update XX_QUOTE_APPROVAL_LIST_ALL  SET
+  PERFORM_ACTIVITY_TYPE_CODE = 'P' , CURRENT_RECORD_FLAG = 'Y' , CREATED_BY = '".$_SESSION["USER_ID"]."', LAST_UPDATED_BY = '".$_SESSION["USER_ID"]."'
+  WHERE QUOTE_HEADER_ID = '".$_SESSION['QUOTE_HEADER_ID']."' AND SEQUENCE_NO = 10";
+
+  $result4 = oci_parse($conn, $query4);
+
+  oci_execute($result4);
+
+  $query5= "DELETE FROM XX_QUOTE_DRAFT_APPR_LIST_ALL
+  WHERE QUOTE_HEADER_ID = '".$_SESSION['QUOTE_HEADER_ID']."' ";
+
+  $result5 = oci_parse($conn, $query5);
+
+  oci_execute($result5);
+
+
+
+  unset($_SESSION["P_QUOTE_HEADER_ID"]);
+  unset($_SESSION["INTEREST_AMOUNT"]);
+  unset($_SESSION["MONTHLY_INSTALLMENT_AMOUNT"]);
+  unset($_SESSION["TOTAL"]);
+  unset($_SESSION['TEST_DP_PERCENT']);
+  unset($_SESSION['TEST_ACTUAL_DP_AMOUNT']);
+
+  header("Location: homepage.php?Data_Successfully_saved");
+
+  $_SESSION["QUOTE_HEADER_ID"] = "";
+
+}
+
+elseif(isset($_POST['save'])){
+
+  session_start();
+
+include '../../includes/dbh.inc.php';
+
+  $_SESSION['QUOTE_STATUS'] = "DRAFT";
+  $_SESSION['NOTIFI_STATUS'] = 3;
+
+
+  $QUOTE_HEADER_ID = $_SESSION["P_QUOTE_HEADER_ID"];
+  $ASSESSMENT_NUMBER = $_SESSION["ASSESSMENT_NUMBER"];
+  $CUSTOMER_ID = $_SESSION["CUSTOMER_ID"];
+  $QUOTE_NUMBER = $_SESSION["QUOTE_NUMBER"];
+  $QUOTE_NAME = $_SESSION["QUOTE_NAME"];
+  $QUOTE_DATE = $_SESSION['QUOTE_DATE'];
+  // $QS_APPROVERS1 = $_SESSION['QS_APPROVERS1'];
+  $QUOTE_TYPE_NAME = $_SESSION['QUOTE_TYPE'];
+  $QUOTE_STATUS = $_SESSION['QUOTE_STATUS'];
+  $NOTIFI_STATUS = $_SESSION['NOTIFI_STATUS'];
+  $CURRENCY = $_SESSION['CURRENCY'];
+  $NO_OF_INSTALLMENT = $_SESSION['NO_OF_INSTALLMENT'];
+  $DP_AMOUNT = $_SESSION['DP_AMOUNT'];
+  $DP_PERCENT = $_SESSION['DP_PERCENT'];
+  $ACTUAL_DP_AMOUNT = $_SESSION['ACTUAL_DP_AMOUNT'];
+  $NO_OF_FREE_INSTALLMENT = $_SESSION['NO_OF_FREE_INSTALLMENT'];
+  $DISCOUNT_VALUE = $_SESSION['DISCOUNT_VALUE'];
+  $DISCOUNT_TYPE = $_SESSION['DISCOUNT_TYPE'];
+  $INSTALLMENT_START_DAY = $_SESSION['INSTALLMENT_START_DAY'];
+  $PAYMENT_TYPE = $_SESSION['PAYMENT_TYPE'];
+  $CHEQUE_REF_NO = $_SESSION['CHEQUE_REF_NO'];
+  $REMITTANCE_BANK_ID = $_SESSION['REMITTANCE_BANK_NAME'];
+  $REMITTANCE_BRANCH_ID = $_SESSION['REMITTANCE_BRANCE_NAME'];
+  $BANK_ACCOUNT_NO = $_SESSION['BANK_ACCOUNT_NO'];
+  $MICR_CHEQUE_GIVEN_IN_DEL = $_SESSION['MICR_CHEQUE_GIVEN_IN_DEL'];
+  $CUSTOMER_BANK_NAME = $_SESSION['CUSTOMER_BANK_NAME'];
+  $AGENT_DEALER_COMM_PAYABLE = $_SESSION['AGENT_DEALER_COMM_PAYABLE'];
+  $NAME_OF_AGENT_DEALER= $_SESSION['NAME_OF_AGENT_DEALER'];
+  $NAME_OF_PROMO_SCHEME = $_SESSION['NAME_OF_PROMO_SCHEME'];
+  $PROMO_GIFT_APPLICABLE = $_SESSION['PROMO_GIFT_APPLICABLE'];
+  $NAME_OF_GIFT = $_SESSION['NAME_OF_GIFT'];
+  $ORGANIZATION_ID = $_SESSION["ORGANIZATION_ID"];
+  $ORG_ID = $_SESSION["ORG_ID"];
+  $REMARKS = $_SESSION['REMARKS'];
+  $REGISTRATION_AMOUNT = $_SESSION["REGISTRATION_AMOUNT"];
+  $REGISTRATION_INC = $_SESSION["REGISTRATION_INC"];
+  $USER_STATUS1 = 0;
+
+  $sql90 = "SELECT list_header_id price_list_id,NAME price_list_name FROM qp_list_headers_v
+  WHERE AUTOMATIC_FLAG='Y'
+  AND CURRENCY_CODE='BDT'
+  AND ACTIVE_FLAG='Y'
+  AND NAME = '".$_SESSION['PRICE_LIST_NAME']."'
+  AND TRUNC(SYSDATE) BETWEEN START_DATE_ACTIVE AND NVL(END_DATE_ACTIVE,TRUNC(SYSDATE))
+  AND ORIG_ORG_ID = '".$_SESSION['ORG_ID']."' ";
+
+  $result90= oci_parse($conn, $sql90);
+  oci_execute($result90);
+  while($row90 =oci_fetch_array($result90,OCI_ASSOC)):
+    $PRICE_LIST_ID = $row90["PRICE_LIST_ID"];
+  endwhile;
+
+  $sql91 = "SELECT TTT.TRANSACTION_TYPE_ID, NAME, DESCRIPTION
+  FROM oe_transaction_types_tl ttt, oe_transaction_types_all tta
+ WHERE     ttt.TRANSACTION_TYPE_ID = tta.TRANSACTION_TYPE_ID
+       AND TRANSACTION_TYPE_CODE = 'ORDER'
+       AND NAME = '".$QUOTE_TYPE_NAME."'
+       AND NVL (END_DATE_ACTIVE, TRUNC (SYSDATE)) >= TRUNC (SYSDATE)
+       AND tta.org_id = '".$_SESSION['ORG_ID']."'
+       AND WAREHOUSE_ID = '".$_SESSION["ORGANIZATION_ID"]."' ";
+
+  $result91 = oci_parse($conn, $sql91);
+  oci_execute($result91);
+  while($row91 =oci_fetch_array($result91,OCI_ASSOC)):
+    $QUOTE_TYPE_ID = $row91["TRANSACTION_TYPE_ID"];
+  endwhile;
+
+
+
+
+   $CREATED_BY = $_SESSION['u_id'];
+  // $USER_PWD = $_SESSION['p_id'];
+
+  $sql ="INSERT INTO XX_QUOTE_HEADERS_ALL (QUOTE_HEADER_ID,ORG_ID,ASSESSMENT_NUMBER,ORGANIZATION_ID,CUSTOMER_ID,QUOTE_NUMBER,QUOTE_NAME,QUOTE_DATE,QUOTE_TYPE_ID,QUOTE_STATUS,NOTIFI_STATUS,CURRENCY,NO_OF_INSTALLMENT,DP_AMOUNT,DP_PERCENT,ACTUAL_DP_AMOUNT,NO_OF_FREE_INSTALLMENT,DISCOUNT_VALUE,DISCOUNT_TYPE,INSTALLMENT_START_DAY,PAYMENT_TYPE,CHEQUE_REF_NO,REMITTANCE_BANK_ID,REMITTANCE_BRANCH_ID,BANK_ACCOUNT_NO,MICR_CHEQUE_GIVEN_IN_DEL,CUSTOMER_BANK_NAME,AGENT_DEALER_COMM_PAYABLE,NAME_OF_AGENT_DEALER,NAME_OF_PROMO_SCHEME, PROMO_GIFT_APPLICABLE, NAME_OF_GIFT, REMARKS, USER_STATUS1, CREATED_BY, PRICE_LIST_ID,REGISTRATION_AMOUNT,REGISTRATION_INC, CREATION_DATE)
+  values (:QUOTE_HEADER_ID,:ORG_ID,:ASSESSMENT_NUMBER,:ORGANIZATION_ID,:CUSTOMER_ID, :QUOTE_NUMBER,:QUOTE_NAME,TO_DATE('".$QUOTE_DATE."','yyyy-mm-dd'), :QUOTE_TYPE_ID, :QUOTE_STATUS, :NOTIFI_STATUS, :CURRENCY, :NO_OF_INSTALLMENT,:DP_AMOUNT, :DP_PERCENT, :ACTUAL_DP_AMOUNT, :NO_OF_FREE_INSTALLMENT, :DISCOUNT_VALUE, :DISCOUNT_TYPE, :INSTALLMENT_START_DAY, :PAYMENT_TYPE, :CHEQUE_REF_NO, :REMITTANCE_BANK_ID, :REMITTANCE_BRANCH_ID, :BANK_ACCOUNT_NO, :MICR_CHEQUE_GIVEN_IN_DEL, :CUSTOMER_BANK_NAME, :AGENT_DEALER_COMM_PAYABLE, :NAME_OF_AGENT_DEALER, :NAME_OF_PROMO_SCHEME, :PROMO_GIFT_APPLICABLE, :NAME_OF_GIFT, :REMARKS, :USER_STATUS1, :CREATED_BY, :PRICE_LIST_ID,:REGISTRATION_AMOUNT,:REGISTRATION_INC, sysdate )";
+
+  $result= oci_parse($conn, $sql);
+  oci_bind_by_name($result, ":QUOTE_HEADER_ID", $QUOTE_HEADER_ID);
+  oci_bind_by_name($result, ":ORG_ID", $ORG_ID);
+  oci_bind_by_name($result, ":ASSESSMENT_NUMBER", $ASSESSMENT_NUMBER);
+  oci_bind_by_name($result, ":ORGANIZATION_ID", $ORGANIZATION_ID);
+  oci_bind_by_name($result, ":CUSTOMER_ID", $CUSTOMER_ID);
+  oci_bind_by_name($result, ":QUOTE_NUMBER", $QUOTE_NUMBER);
+  oci_bind_by_name($result, ":QUOTE_NAME", $QUOTE_NAME);
+  oci_bind_by_name($result, ":QUOTE_TYPE_ID", $QUOTE_TYPE_ID);
+  oci_bind_by_name($result, ":QUOTE_STATUS", $QUOTE_STATUS);
+  oci_bind_by_name($result, ":NOTIFI_STATUS", $NOTIFI_STATUS);
+  oci_bind_by_name($result, ":CURRENCY", $CURRENCY);
+  oci_bind_by_name($result, ":NO_OF_INSTALLMENT", $NO_OF_INSTALLMENT);
+  oci_bind_by_name($result, ":DP_AMOUNT", $DP_AMOUNT);
+  oci_bind_by_name($result, ":DP_PERCENT", $DP_PERCENT);
+  oci_bind_by_name($result, ":ACTUAL_DP_AMOUNT", $ACTUAL_DP_AMOUNT);
+  oci_bind_by_name($result, ":NO_OF_FREE_INSTALLMENT", $NO_OF_FREE_INSTALLMENT);
+  oci_bind_by_name($result, ":DISCOUNT_VALUE", $DISCOUNT_VALUE);
+  oci_bind_by_name($result, ":DISCOUNT_TYPE", $DISCOUNT_TYPE);
+  oci_bind_by_name($result, ":INSTALLMENT_START_DAY", $INSTALLMENT_START_DAY);
+  oci_bind_by_name($result, ":PAYMENT_TYPE", $PAYMENT_TYPE);
+  oci_bind_by_name($result, ":CHEQUE_REF_NO", $CHEQUE_REF_NO);
+  oci_bind_by_name($result, ":REMITTANCE_BANK_ID", $REMITTANCE_BANK_ID);
+  oci_bind_by_name($result, ":REMITTANCE_BRANCH_ID", $REMITTANCE_BRANCH_ID);
+  oci_bind_by_name($result, ":BANK_ACCOUNT_NO", $BANK_ACCOUNT_NO);
+  oci_bind_by_name($result, ":MICR_CHEQUE_GIVEN_IN_DEL", $MICR_CHEQUE_GIVEN_IN_DEL);
+  oci_bind_by_name($result, ":CUSTOMER_BANK_NAME", $CUSTOMER_BANK_NAME);
+  oci_bind_by_name($result, ":AGENT_DEALER_COMM_PAYABLE", $AGENT_DEALER_COMM_PAYABLE);
+  oci_bind_by_name($result, ":NAME_OF_AGENT_DEALER", $NAME_OF_AGENT_DEALER);
+  oci_bind_by_name($result, ":NAME_OF_PROMO_SCHEME", $NAME_OF_PROMO_SCHEME);
+  oci_bind_by_name($result, ":PROMO_GIFT_APPLICABLE", $PROMO_GIFT_APPLICABLE);
+  oci_bind_by_name($result, ":NAME_OF_GIFT", $NAME_OF_GIFT);
+  oci_bind_by_name($result, ":REMARKS", $REMARKS);
+  // oci_bind_by_name($result, ":QS_APPROVERS1", $QS_APPROVERS1);
+
+
+  // oci_bind_by_name($result, ":APPROVERS1", $APPROVERS1);
+  // oci_bind_by_name($result, ":APPROVERS2", $APPROVERS2);
+  // oci_bind_by_name($result, ":APPROVERS3", $APPROVERS3);
+
+  oci_bind_by_name($result, ":USER_STATUS1", $USER_STATUS1);
+  // oci_bind_by_name($result, ":USER_STATUS2", $USER_STATUS2);
+  // oci_bind_by_name($result, ":USER_STATUS3", $USER_STATUS3);
+  oci_bind_by_name($result, ":CREATED_BY", $CREATED_BY);
+  oci_bind_by_name($result, ":PRICE_LIST_ID", $PRICE_LIST_ID);
+  oci_bind_by_name($result, ":REGISTRATION_AMOUNT", $REGISTRATION_AMOUNT);
+  oci_bind_by_name($result, ":REGISTRATION_INC", $REGISTRATION_INC);
+
+  oci_execute($result);
+
+
+  $query1 = "Select QUOTE_HEADER_ID from XX_QUOTE_HEADERS_ALL where ASSESSMENT_NUMBER = '".$ASSESSMENT_NUMBER."' ";
+
+  $result1= oci_parse($conn, $query1);
+  oci_execute($result1);
+
+  $test = oci_fetch_array($result1,OCI_ASSOC);
+  $_SESSION["QUOTE_HEADER_ID"] =  $test["QUOTE_HEADER_ID"];
+
+
+  $query2 = "Update XX_QUOTE_LINES_ALL
+  SET QUOTE_HEADER_ID = '".$_SESSION["QUOTE_HEADER_ID"]."' , ORGANIZATION_ID = '".$_SESSION["ORGANIZATION_ID"]."'
+  WHERE ASSESSMENT_NUMBER = '".$_SESSION['ASSESSMENT_NUMBER']."'";
+
+  $result2 = oci_parse($conn, $query2);
+
+  oci_execute($result2);
+
+
+  unset($_SESSION["P_QUOTE_HEADER_ID"]);
+  unset($_SESSION["INTEREST_AMOUNT"]);
+  unset($_SESSION["MONTHLY_INSTALLMENT_AMOUNT"]);
+  unset($_SESSION["TOTAL"]);
+  unset($_SESSION['TEST_DP_PERCENT']);
+  unset($_SESSION['TEST_ACTUAL_DP_AMOUNT']);
+
+
+
+  // header("Location: homepage.php?Data_saved");
+
+}
+  else
+{
+
+  header("Location: page1.php");
+  exit();
+
+}
+
+ ?>
